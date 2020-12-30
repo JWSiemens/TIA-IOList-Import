@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30717.126
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TIA_Addin_IO_List_Import", "TIA Addin - IO List Import\TIA_Addin_IO_List_Import.csproj", "{097284F1-6EED-4AFF-B969-C2569868F292}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{097284F1-6EED-4AFF-B969-C2569868F292}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{097284F1-6EED-4AFF-B969-C2569868F292}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{097284F1-6EED-4AFF-B969-C2569868F292}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{097284F1-6EED-4AFF-B969-C2569868F292}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E397C699-652A-4E3D-96CE-B0EC3C73D537}
+	EndGlobalSection
+EndGlobal
