@@ -48,5 +48,19 @@ namespace TIA_Addin___IO_List_Import
         {
             return MenuStatus.Enabled;
         }
+
+        //Give access to add-in tester
+        public IEnumerable<IEngineeringObject> GetSelection(string label)
+        {
+            var selection = new List<IEngineeringObject>();
+            var myProject = _tiaPortal.Projects.First();
+
+            if (myProject != null)
+                selection.Add(myProject);
+            // Add items to selection
+
+            return selection;
+        }
+
     }
 }
