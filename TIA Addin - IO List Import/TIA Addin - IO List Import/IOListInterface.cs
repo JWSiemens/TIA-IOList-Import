@@ -16,7 +16,7 @@ using Siemens.Engineering.HW.Features;
 using Siemens.Engineering.SW;
 using Siemens.Engineering.SW.Tags;
 
-namespace TIA_Addin___IO_List_Import
+namespace TIA_Addin_IO_List_Import
 {
     public partial class IOListInterface : Form
     {
@@ -33,6 +33,9 @@ namespace TIA_Addin___IO_List_Import
         {
             InitializeComponent();
 
+            //test code to get window to show up on top
+            
+
             //My code to move project info to the form --- JW
             MyTiaPortal = tiaPortal;
             MyProject = MyTiaPortal.Projects.First();
@@ -41,6 +44,10 @@ namespace TIA_Addin___IO_List_Import
 
         private void btn_ReadCSV_Click(object sender, EventArgs e)
         {
+            //this function reads in data from CSV file and populates a data grid view
+            //disable read and import buttons
+            btn_ReadCSV.Enabled = false;
+            btn_CreateHW.Enabled = false;
             try
             {
                 string csvFilePath = tb_CSVFileLocation.Text;
@@ -49,7 +56,7 @@ namespace TIA_Addin___IO_List_Import
                 Fields = Lines[0].Split(new char[] { ',' });
                 int numColumns = Fields.GetLength(0);
                 DataTable dt = new DataTable();
-                for (int i = 0; i < numColumns; i++)                        //Remember that the for loop either runs between {} or if no brackets are place it will just run once
+                for (int i = 0; i < numColumns; i++)                        
                     dt.Columns.Add(Fields[i].ToLower(), typeof(string));
                 DataRow Row;
                 for (int i = 1; i < Lines.GetLength(0); i++)
@@ -62,28 +69,36 @@ namespace TIA_Addin___IO_List_Import
                 }
                 dataGridView1.DataSource = dt;
 
-                //------------------Debug code------------------------
-                /*Console.WriteLine("The read has completed");
-                string tableValue = (String)dt.Rows[1][1];
-                tb_testVar.Text = tableValue;*/
-                //----------------------------------------------------
+                //Enable read and import button
+                btn_CreateHW.Enabled = true;
+                btn_ReadCSV.Enabled = true;
 
             }
             catch (Exception ex)
             {
                 MessageBox.Show("An error occured: " + ex.ToString());
-                throw; // this throws an error and stops the application
+                //Disbale import button and reenable read button
+                btn_ReadCSV.Enabled = true;
+                btn_CreateHW.Enabled = false;
+                //throw; // this throws an error and stops the application
             }
         }
 
         private void btn_CreateHW_Click(object sender, EventArgs e)
         {
-            btn_CreateHW.Enabled = false;   //Disable button during operation
+            //disable read and import button during operation
+            btn_CreateHW.Enabled = false;
+            btn_ReadCSV.Enabled = false;
             int numOfRows = dataGridView1.RowCount;
             int numOfColumns = dataGridView1.ColumnCount;
             List<string> ioNodes = new List<string>();
             List<string> ioNodeMasters = new List<string>();
             List<string> ioControllers_str = new List<string>();
+
+            //Create max value for progress bar, currently will be using a simple tracking method that will only kind of show you the progress.
+            //To do it right all of the PLCs, IMs, and other equipment as necessary should be counted so in addition to the row count since it will run through loops for each
+            pb_HWProgress.Maximum = numOfRows;
+
 
             //Device creation loop
             for (int i = 0; i < numOfRows - 1; i++)
@@ -92,12 +107,13 @@ namespace TIA_Addin___IO_List_Import
 
                 //Collect part data, for it to work the MLFB takes this format: OrderNumber:MLFB#/FirmwareVersion
                 string MLFB = "OrderNumber:" + (string)dataGridView1.Rows[i].Cells[7].Value + "/" + (string)dataGridView1.Rows[i].Cells[8].Value;
-
-                //create rack name
-                string rackName = (string)dataGridView1.Columns[2].HeaderText + (string)dataGridView1.Rows[i].Cells[2].Value;
-                Console.WriteLine("The rack got named: " + rackName);
-                //Read tagname
+                                
+                //Read io Type per io list
                 string ioType = (string)dataGridView1.Rows[i].Cells[1].Value;
+                //create rack name
+                string rackName = "";
+                if (ioType != "PLC")
+                    rackName = (string)dataGridView1.Columns[2].HeaderText + (string)dataGridView1.Rows[i].Cells[2].Value;
                 //Acquire IP, subnet mask, and default gateway
                 string[] networkAddress = { "", "", "" }; //order of this array is: IPAddress, SubnetMask, Gateway(gateway only used for controllers)
                 networkAddress[0] = (string)dataGridView1.Rows[i].Cells[9].Value; //IPAddress
@@ -108,12 +124,14 @@ namespace TIA_Addin___IO_List_Import
                 switch (ioType)
                 {
                     case "IM":
+                        
                         //add interface module
                         addDevice(MLFB, rackName, networkAddress, ioType);
                         //add rack name to list for network connections
                         ioNodes.Add(rackName);
                         //add the IO controller name to list of network connection lists
                         ioNodeMasters.Add((string)dataGridView1.Rows[i].Cells[5].Value);
+                        
                         break;
 
                     case "PLC":
@@ -133,7 +151,9 @@ namespace TIA_Addin___IO_List_Import
                         break;
                 }
 
-
+                //Increment progress bar, will be at 50 percent when this section is complete
+                if (i%2 == 0)
+                    pb_HWProgress.Value = pb_HWProgress.Value + 1;
 
             }
 
@@ -201,7 +221,7 @@ namespace TIA_Addin___IO_List_Import
             #endregion
 
 
-            //Connect all created IO Nodes to subnet1 and then assign to associated controller
+            //Connect all created IO Nodes and IO masters to subnet1 and then assign IO Nodes to associated controller
             for (int i = 0; i < ioNodes.Count; i++)
             {
 
@@ -235,6 +255,8 @@ namespace TIA_Addin___IO_List_Import
 
             }
 
+            //Increment progress bar by 12.5%
+            pb_HWProgress.Value = pb_HWProgress.Value + numOfRows / 8;
 
 
             //Create tags for all IO points on the IO list
@@ -268,7 +290,7 @@ namespace TIA_Addin___IO_List_Import
                     if (plcSoftware is PlcSoftware)
                         Console.WriteLine("The plc software has been selected of PLC Main");
                     else
-                        Console.WriteLine("Get Fucked, the object selected is not PLC software");
+                        Console.WriteLine("The object selected is not PLC software");
 
                     //read startAddress
                     int startAddress = (int)addressComp.StartAddress;
@@ -292,9 +314,7 @@ namespace TIA_Addin___IO_List_Import
                     int channelStartAddress = channelSize * channel;
                     int numBytes = channelStartAddress / 8;
                     int bitAdjust = channelStartAddress - (numBytes * 8);
-
-
-                    //----------------------------------------------working----------------------------------------------------
+ 
                     switch (ioType)
                     {
                         case "DI":
@@ -355,9 +375,14 @@ namespace TIA_Addin___IO_List_Import
 
                     //Create tag
                     tagComposition.Create(tagname, dataType, channelAddress);
+                    Console.WriteLine(tagname + " tag has been created and is assigned to: " + channelAddress);
 
-
+                    //increm
                 }
+                //increment progress bar
+                if (i % 4 == 0)
+                    pb_HWProgress.Value = pb_HWProgress.Value + 1;
+
             }
 
             //Compile hardware for each controller
@@ -372,9 +397,11 @@ namespace TIA_Addin___IO_List_Import
                 CompilerResult result = compileService.Compile();
                 //Capture compile data
                 LogCompileData(result, ioController);
+              
             }
-            //Re-enable button
-            btn_CreateHW.Enabled = true;
+
+            this.Close();
+
         }
 
         public void addDevice(string MLFB, string Name, string[] NetworkAddress, string IoType)
@@ -383,8 +410,8 @@ namespace TIA_Addin___IO_List_Import
             string devName = "station" + Name;
 
 
-            //the for loop below checks to see if there is another PLC or HMI in the project with the same name that is trying to be added, 
-            //this will need adapted to accomadate racks as well. Or remove it so that the only way to utilize the tool is to create a blank project.
+            //the for loop below checks to see if there is another PLC, HMI, or rack in the project with the same name that is trying to be added, 
+            
             foreach (Device device in MyProject.Devices)
             {
                 DeviceItemComposition deviceItemAggregation = device.DeviceItems;
@@ -431,6 +458,7 @@ namespace TIA_Addin___IO_List_Import
 
 
                 tb_Status.Text = "Add Device Name: " + Name + " with " + MLFB.Substring(0, MLFB.Length - 5) + " and Firmware Version: " + MLFB.Substring(MLFB.Length - 5);
+                Console.WriteLine(Name + " was created");
             }
         }
 
@@ -453,13 +481,12 @@ namespace TIA_Addin___IO_List_Import
                 if (rack.CanPlugNew(MLFB, CardName, Slot))
                     rack.PlugNew(MLFB, CardName, Slot);
                 else
-                    MessageBox.Show("Module will not allow card to be plugged into slot " + Slot);
-
-
+                    Console.WriteLine("Module will not allow card to be plugged into slot " + Slot + 
+                        ". This is either another channel of an existing card or there is an incompatibility with the part");
             }
             catch (Exception ex)
             {
-                MessageBox.Show("An error occured: " + ex.ToString());
+                MessageBox.Show("The program has stopped, an error occured: " + ex.ToString());
                 throw;
             }
         }

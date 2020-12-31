@@ -6,7 +6,7 @@ using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace TIA_Addin___IO_List_Import
+namespace TIA_Addin_IO_List_Import
 {
     public class AddIn : ContextMenuAddIn
     {
@@ -38,10 +38,23 @@ namespace TIA_Addin___IO_List_Import
             string selectedObjectNames = string.Join(Environment.NewLine, selectedObjects.Select(selection => (string)selection.GetAttribute("Name")));
 
 
+            
             //Open form and pass current TIA project to app
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new IOListInterface(_tiaPortal));
+            //Application.Run(new IOListInterface(_tiaPortal));
+
+                   
+            IOListInterface form1 = new IOListInterface(_tiaPortal);
+            //Update title of form
+            form1.Text = "IO Import Tool";
+            //Place form on top of Portal Window
+            form1.TopMost = true;
+            form1.ShowDialog();
+            
+         
+            
+
         }
 
         private MenuStatus DisplayStatus(MenuSelectionProvider<IEngineeringObject> menuSelectionProvider)

@@ -1,6 +1,6 @@
 ﻿using System.Windows.Forms;
 
-namespace TIA_Addin___IO_List_Import
+namespace TIA_Addin_IO_List_Import
 {
     internal static class Util
     {

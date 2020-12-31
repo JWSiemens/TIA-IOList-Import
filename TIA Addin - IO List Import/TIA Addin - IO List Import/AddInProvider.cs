@@ -3,7 +3,7 @@ using Siemens.Engineering.AddIn;
 using Siemens.Engineering.AddIn.Menu;
 using System.Collections.Generic;
 
-namespace TIA_Addin___IO_List_Import
+namespace TIA_Addin_IO_List_Import
 {
     public sealed class AddInProvider : ProjectTreeAddInProvider
     {

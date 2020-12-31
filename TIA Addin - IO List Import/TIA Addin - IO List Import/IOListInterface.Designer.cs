@@ -1,5 +1,5 @@
 ﻿
-namespace TIA_Addin___IO_List_Import
+namespace TIA_Addin_IO_List_Import
 {
     partial class IOListInterface
     {
@@ -92,7 +92,7 @@ namespace TIA_Addin___IO_List_Import
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(36, 449);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(156, 24);
+            this.label2.Size = new System.Drawing.Size(130, 20);
             this.label2.TabIndex = 5;
             this.label2.Text = "Log File Location";
             // 
@@ -106,6 +106,7 @@ namespace TIA_Addin___IO_List_Import
             // 
             // btn_CreateHW
             // 
+            this.btn_CreateHW.Enabled = false;
             this.btn_CreateHW.Location = new System.Drawing.Point(76, 532);
             this.btn_CreateHW.Name = "btn_CreateHW";
             this.btn_CreateHW.Size = new System.Drawing.Size(277, 124);
@@ -126,11 +127,11 @@ namespace TIA_Addin___IO_List_Import
             this.label3.AutoSize = true;
             this.label3.Location = new System.Drawing.Point(540, 573);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(236, 24);
+            this.label3.Size = new System.Drawing.Size(197, 20);
             this.label3.TabIndex = 9;
             this.label3.Text = "Progress of Harware Build:";
             // 
-            // Form1
+            // IOListInterface
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -145,7 +146,7 @@ namespace TIA_Addin___IO_List_Import
             this.Controls.Add(this.label1);
             this.Controls.Add(this.dataGridView1);
             this.Controls.Add(this.btn_ReadCSV);
-            this.Name = "Form1";
+            this.Name = "IOListInterface";
             this.Text = "Form1";
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.ResumeLayout(false);
