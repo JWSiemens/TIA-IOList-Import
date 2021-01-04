@@ -21,11 +21,7 @@ namespace TIA_Addin_IO_List_Import
 
         protected override void BuildContextMenuItems(ContextMenuAddInRoot addInRootSubmenu)
         {
-            addInRootSubmenu.Items.AddActionItem<IEngineeringObject>("Run IO Import", OnClick, DisplayStatus);
-            Submenu settingsSubmenu = addInRootSubmenu.Items.AddSubmenu("Settings - Not used currently");
-            settingsSubmenu.Items.AddActionItemWithCheckBox<IEngineeringObject>("Check Box", _settings.CheckBoxOnClick, _settings.CheckBoxDisplayStatus);
-            settingsSubmenu.Items.AddActionItemWithRadioButton<IEngineeringObject>("Radio Button 1", _settings.RadioButton1OnClick, _settings.RadioButton1DisplayStatus);
-            settingsSubmenu.Items.AddActionItemWithRadioButton<IEngineeringObject>("Radio Button 2", _settings.RadioButton2OnClick, _settings.RadioButton2DisplayStatus);
+            addInRootSubmenu.Items.AddActionItem<IEngineeringObject>("Run IO Import", OnClick, DisplayStatus);            
         }
 
         private void OnClick(MenuSelectionProvider<IEngineeringObject> menuSelectionProvider)
