@@ -61,6 +61,12 @@
   <ItemGroup>
     <Compile Include="AddIn.cs" />
     <Compile Include="AddInProvider.cs" />
+    <Compile Include="LoadingBar.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="LoadingBar.Designer.cs">
+      <DependentUpon>LoadingBar.cs</DependentUpon>
+    </Compile>
     <Compile Include="IOListInterface.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -77,6 +83,9 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="LoadingBar.resx">
+      <DependentUpon>LoadingBar.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="IOListInterface.resx">
       <DependentUpon>IOListInterface.cs</DependentUpon>
     </EmbeddedResource>

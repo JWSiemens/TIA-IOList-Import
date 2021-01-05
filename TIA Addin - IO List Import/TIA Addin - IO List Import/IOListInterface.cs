@@ -6,6 +6,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Siemens.Engineering;
@@ -33,10 +34,11 @@ namespace TIA_Addin_IO_List_Import
         {
             InitializeComponent();
 
-            //test code to get window to show up on top
-            
+            //force background worker to report progress and allow cancellation
+            backgroundWorker1.WorkerReportsProgress = true;
+            backgroundWorker1.WorkerSupportsCancellation = true;
 
-            //My code to move project info to the form --- JW
+            //Move project info to the form
             MyTiaPortal = tiaPortal;
             MyProject = MyTiaPortal.Projects.First();
         }
@@ -89,6 +91,18 @@ namespace TIA_Addin_IO_List_Import
             //disable read and import button during operation
             btn_CreateHW.Enabled = false;
             btn_ReadCSV.Enabled = false;
+            //Make this form invisible until complete, work around to get smooth look to add-in function
+            this.Opacity = 0.0;
+
+            /*
+            //Work around to allow loading bar to show in place of (Not Responding) form.
+            //Open form and pass current TIA project to app
+            LoadingBar loadingbarForm = new LoadingBar();
+            //Place form on top of Portal Window
+            loadingbarForm.TopMost = true;
+            loadingbarForm.ShowDialog();
+            */
+
             int numOfRows = dataGridView1.RowCount;
             int numOfColumns = dataGridView1.ColumnCount;
             List<string> ioNodes = new List<string>();
@@ -103,8 +117,6 @@ namespace TIA_Addin_IO_List_Import
             //Device creation loop
             for (int i = 0; i < numOfRows - 1; i++)
             {
-
-
                 //Collect part data, for it to work the MLFB takes this format: OrderNumber:MLFB#/FirmwareVersion
                 string MLFB = "OrderNumber:" + (string)dataGridView1.Rows[i].Cells[7].Value + "/" + (string)dataGridView1.Rows[i].Cells[8].Value;
                                 
@@ -400,7 +412,9 @@ namespace TIA_Addin_IO_List_Import
               
             }
 
+            //Close form and return to Portal
             this.Close();
+            
 
         }
 
@@ -474,8 +488,6 @@ namespace TIA_Addin_IO_List_Import
                 Device distIO = MyProject.Devices.Find(devName);
                 //pull container location from device and set to var
                 DeviceItem rack = distIO.DeviceItems.First(de => de.Name == "Rack_0");
-                //Check to see if card already exists
-
 
                 // check if card can be added, if so add it
                 if (rack.CanPlugNew(MLFB, CardName, Slot))
@@ -522,6 +534,91 @@ namespace TIA_Addin_IO_List_Import
                 Log.WriteLine(indent + "Error Count: " + message.ErrorCount);
                 RecursivelyWriteMessages(message.Messages, Log, indent);
             }
+        }
+
+        private void btn_AsyncTest_Click(object sender, EventArgs e)
+        {
+            if (backgroundWorker1.IsBusy != true)
+            {
+                //Disable button while task running
+                btn_AsyncTest.Enabled = false;
+                tb_Status.Text = "Hardware being created in the background";
+                //Reset progress bar to 0
+                pb_HWProgress.Value = 0;
+                //Acquire data from table to pass to background worker
+                DataTable dt = (DataTable)dataGridView1.DataSource;
+                
+                //test code
+                var valueFromTable = (string)dt.Rows[0][5];
+                Console.WriteLine("the value in the table is: " + valueFromTable);
+
+                //Run background task, see backgroundworker item in design view for called functions
+                backgroundWorker1.RunWorkerAsync(dt);
+            }
+        }
+
+        private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
+        {
+            DataTable dt = (DataTable)e.Argument;
+            string plcName = (string)dt.Rows[0][5];
+            try
+            {
+                Device plc = MyProject.Devices.Find("station" + plcName);
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show("There was an error: " + ex);
+            }
+            
+            /*DeviceItem localRack = plc.DeviceItems.First(de => de.Name == "Rail_0");
+            backgroundWorker1.ReportProgress(25);
+
+            if (localRack.CanPlugNew("OrderNumber:6ES7 521-1BH00-0AB0/V2.2", "DI1", 2))
+                localRack.PlugNew("OrderNumber:6ES7 521-1BH00-0AB0/V2.2", "DI1", 2);
+            else
+                backgroundWorker1.ReportProgress(11);*/
+                      
+            Thread.Sleep(5000);
+            backgroundWorker1.ReportProgress(50);
+            Thread.Sleep(5000);
+            backgroundWorker1.ReportProgress(75);
+            Thread.Sleep(5000);
+            backgroundWorker1.ReportProgress(99);
+
+        }
+
+        private void backgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            if (e.ProgressPercentage == 11)
+                Console.WriteLine("Adding card failed");
+            
+            pb_HWProgress.Value = e.ProgressPercentage;
+            Console.WriteLine("The data was passed from the table, here it is: " + e.ProgressPercentage);
+        }
+
+        private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            Console.WriteLine("The background worker is finished");
+            btn_AsyncTest.Enabled = true;
+        }
+
+        private void btn_Test_Click(object sender, EventArgs e)
+        {
+            
+            string plcName = (string)dataGridView1.Rows[0].Cells[5].Value;
+            Console.WriteLine("The name of the plc is " + plcName);
+            Device plc = MyProject.Devices.Find("station" + plcName);
+            DeviceItem localRack = plc.DeviceItems.First(de => de.Name == "Rail_0");
+
+            if (localRack.CanPlugNew("OrderNumber:6ES7 521-1BH00-0AB0/V2.2", "DI1", 2))
+            {
+                Console.WriteLine("Attempting to add card...");
+                localRack.PlugNew("OrderNumber:6ES7 521-1BH00-0AB0/V2.2", "DI1", 2);
+
+            }
+
+            else
+                Console.WriteLine("Fuck you");
         }
     }
 }

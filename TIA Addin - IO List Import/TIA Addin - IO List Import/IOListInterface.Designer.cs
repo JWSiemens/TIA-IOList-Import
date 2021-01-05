@@ -39,6 +39,9 @@ namespace TIA_Addin_IO_List_Import
             this.btn_CreateHW = new System.Windows.Forms.Button();
             this.pb_HWProgress = new System.Windows.Forms.ProgressBar();
             this.label3 = new System.Windows.Forms.Label();
+            this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
+            this.btn_AsyncTest = new System.Windows.Forms.Button();
+            this.btn_Test = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -77,7 +80,7 @@ namespace TIA_Addin_IO_List_Import
             this.tb_CSVFileLocation.Name = "tb_CSVFileLocation";
             this.tb_CSVFileLocation.Size = new System.Drawing.Size(411, 26);
             this.tb_CSVFileLocation.TabIndex = 3;
-            this.tb_CSVFileLocation.Text = "H:\\VersionControlSpace\\AppNote2021-CSVtoTIA\\IO List\\IO List Template.csv";
+            this.tb_CSVFileLocation.Text = "H:\\VersionControlSpace\\io-list-import-tia-add-in\\IO List\\IO List Template.csv";
             // 
             // tb_Status
             // 
@@ -102,7 +105,7 @@ namespace TIA_Addin_IO_List_Import
             this.tb_LogFileLocation.Name = "tb_LogFileLocation";
             this.tb_LogFileLocation.Size = new System.Drawing.Size(411, 26);
             this.tb_LogFileLocation.TabIndex = 6;
-            this.tb_LogFileLocation.Text = "H:\\VersionControlSpace\\MyFirstAddin\\MyFirstAddin\\TIALogs";
+            this.tb_LogFileLocation.Text = "H:\\VersionControlSpace\\io-list-import-tia-add-in\\Compile Logs";
             // 
             // btn_CreateHW
             // 
@@ -131,11 +134,41 @@ namespace TIA_Addin_IO_List_Import
             this.label3.TabIndex = 9;
             this.label3.Text = "Progress of Harware Build:";
             // 
+            // backgroundWorker1
+            // 
+            this.backgroundWorker1.WorkerReportsProgress = true;
+            this.backgroundWorker1.WorkerSupportsCancellation = true;
+            this.backgroundWorker1.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker1_DoWork);
+            this.backgroundWorker1.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.backgroundWorker1_ProgressChanged);
+            this.backgroundWorker1.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorker1_RunWorkerCompleted);
+            // 
+            // btn_AsyncTest
+            // 
+            this.btn_AsyncTest.Location = new System.Drawing.Point(926, 472);
+            this.btn_AsyncTest.Name = "btn_AsyncTest";
+            this.btn_AsyncTest.Size = new System.Drawing.Size(348, 112);
+            this.btn_AsyncTest.TabIndex = 10;
+            this.btn_AsyncTest.Text = "Create HW Asynchronosly";
+            this.btn_AsyncTest.UseVisualStyleBackColor = true;
+            this.btn_AsyncTest.Click += new System.EventHandler(this.btn_AsyncTest_Click);
+            // 
+            // btn_Test
+            // 
+            this.btn_Test.Location = new System.Drawing.Point(714, 478);
+            this.btn_Test.Name = "btn_Test";
+            this.btn_Test.Size = new System.Drawing.Size(103, 54);
+            this.btn_Test.TabIndex = 11;
+            this.btn_Test.Text = "Test";
+            this.btn_Test.UseVisualStyleBackColor = true;
+            this.btn_Test.Click += new System.EventHandler(this.btn_Test_Click);
+            // 
             // IOListInterface
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1426, 753);
+            this.Controls.Add(this.btn_Test);
+            this.Controls.Add(this.btn_AsyncTest);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.pb_HWProgress);
             this.Controls.Add(this.btn_CreateHW);
@@ -147,7 +180,7 @@ namespace TIA_Addin_IO_List_Import
             this.Controls.Add(this.dataGridView1);
             this.Controls.Add(this.btn_ReadCSV);
             this.Name = "IOListInterface";
-            this.Text = "Form1";
+            this.Text = "IO List Import";
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -166,5 +199,8 @@ namespace TIA_Addin_IO_List_Import
         private System.Windows.Forms.Button btn_CreateHW;
         private System.Windows.Forms.ProgressBar pb_HWProgress;
         private System.Windows.Forms.Label label3;
+        private System.ComponentModel.BackgroundWorker backgroundWorker1;
+        private System.Windows.Forms.Button btn_AsyncTest;
+        private System.Windows.Forms.Button btn_Test;
     }
 }
