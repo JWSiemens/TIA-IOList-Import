@@ -39,7 +39,6 @@ namespace TIA_Addin_IO_List_Import
             this.btn_CreateHW = new System.Windows.Forms.Button();
             this.pb_HWProgress = new System.Windows.Forms.ProgressBar();
             this.label3 = new System.Windows.Forms.Label();
-            this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.btn_AsyncTest = new System.Windows.Forms.Button();
             this.btn_Test = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
@@ -134,14 +133,6 @@ namespace TIA_Addin_IO_List_Import
             this.label3.TabIndex = 9;
             this.label3.Text = "Progress of Harware Build:";
             // 
-            // backgroundWorker1
-            // 
-            this.backgroundWorker1.WorkerReportsProgress = true;
-            this.backgroundWorker1.WorkerSupportsCancellation = true;
-            this.backgroundWorker1.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker1_DoWork);
-            this.backgroundWorker1.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.backgroundWorker1_ProgressChanged);
-            this.backgroundWorker1.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorker1_RunWorkerCompleted);
-            // 
             // btn_AsyncTest
             // 
             this.btn_AsyncTest.Location = new System.Drawing.Point(926, 472);
@@ -199,7 +190,6 @@ namespace TIA_Addin_IO_List_Import
         private System.Windows.Forms.Button btn_CreateHW;
         private System.Windows.Forms.ProgressBar pb_HWProgress;
         private System.Windows.Forms.Label label3;
-        private System.ComponentModel.BackgroundWorker backgroundWorker1;
         private System.Windows.Forms.Button btn_AsyncTest;
         private System.Windows.Forms.Button btn_Test;
     }

@@ -32,11 +32,7 @@ namespace TIA_Addin_IO_List_Import
 
         public IOListInterface(TiaPortal tiaPortal)
         {
-            InitializeComponent();
-
-            //force background worker to report progress and allow cancellation
-            backgroundWorker1.WorkerReportsProgress = true;
-            backgroundWorker1.WorkerSupportsCancellation = true;
+            InitializeComponent();                 
 
             //Move project info to the form
             MyTiaPortal = tiaPortal;
@@ -91,23 +87,29 @@ namespace TIA_Addin_IO_List_Import
             //disable read and import button during operation
             btn_CreateHW.Enabled = false;
             btn_ReadCSV.Enabled = false;
+
+            //What I think I actually need is to have dispatch control to allow the UI to be attended to while the hardware is being built -- Remove this code/comment when new method is determined
             //Make this form invisible until complete, work around to get smooth look to add-in function
-            this.Opacity = 0.0;
+            //this.Opacity = 0.0;
+
+            //The following code is used to allow the data in the grid view can be used elsewhere
+            DataTable dt_PulledFromForm = new DataTable();
+            dt_PulledFromForm = (DataTable)dataGridView1.DataSource;    //Still working on this one..........Going to replace all locations that have datagridview1 to this datatable...............................................................................................
+
+            //Access utility functions
+            Util utility = new Util(MyTiaPortal);
+            utility.CreateHW(dt_PulledFromForm);
 
             /*
-            //Work around to allow loading bar to show in place of (Not Responding) form.
-            //Open form and pass current TIA project to app
-            LoadingBar loadingbarForm = new LoadingBar();
-            //Place form on top of Portal Window
-            loadingbarForm.TopMost = true;
-            loadingbarForm.ShowDialog();
-            */
 
-            int numOfRows = dataGridView1.RowCount;
-            int numOfColumns = dataGridView1.ColumnCount;
+            int numOfRows = dt_PulledFromForm.Rows.Count;
+            int numOfColumns = dt_PulledFromForm.Columns.Count;
             List<string> ioNodes = new List<string>();
             List<string> ioNodeMasters = new List<string>();
             List<string> ioControllers_str = new List<string>();
+
+            
+
 
             //Create max value for progress bar, currently will be using a simple tracking method that will only kind of show you the progress.
             //To do it right all of the PLCs, IMs, and other equipment as necessary should be counted so in addition to the row count since it will run through loops for each
@@ -118,19 +120,18 @@ namespace TIA_Addin_IO_List_Import
             for (int i = 0; i < numOfRows - 1; i++)
             {
                 //Collect part data, for it to work the MLFB takes this format: OrderNumber:MLFB#/FirmwareVersion
-                string MLFB = "OrderNumber:" + (string)dataGridView1.Rows[i].Cells[7].Value + "/" + (string)dataGridView1.Rows[i].Cells[8].Value;
-                                
+                string MLFB = "OrderNumber:" + (string)dt_PulledFromForm.Rows[i][7] + "/" + (string)dt_PulledFromForm.Rows[i][8];                                
                 //Read io Type per io list
-                string ioType = (string)dataGridView1.Rows[i].Cells[1].Value;
+                string ioType = (string)dt_PulledFromForm.Rows[i][1];
                 //create rack name
                 string rackName = "";
                 if (ioType != "PLC")
-                    rackName = (string)dataGridView1.Columns[2].HeaderText + (string)dataGridView1.Rows[i].Cells[2].Value;
+                    rackName = (string)dt_PulledFromForm.Columns[2].ColumnName + (string)dt_PulledFromForm.Rows[i][2];                  
                 //Acquire IP, subnet mask, and default gateway
                 string[] networkAddress = { "", "", "" }; //order of this array is: IPAddress, SubnetMask, Gateway(gateway only used for controllers)
-                networkAddress[0] = (string)dataGridView1.Rows[i].Cells[9].Value; //IPAddress
-                networkAddress[1] = (string)dataGridView1.Rows[i].Cells[10].Value; //Subnet Mask
-                networkAddress[2] = (string)dataGridView1.Rows[i].Cells[11].Value; //Default Gateway
+                networkAddress[0] = (string)dt_PulledFromForm.Rows[i][9];   //IPAddress
+                networkAddress[1] = (string)dt_PulledFromForm.Rows[i][10];  //Subnet Mask
+                networkAddress[2] = (string)dt_PulledFromForm.Rows[i][11];  //Default Gateway
 
 
                 switch (ioType)
@@ -142,13 +143,12 @@ namespace TIA_Addin_IO_List_Import
                         //add rack name to list for network connections
                         ioNodes.Add(rackName);
                         //add the IO controller name to list of network connection lists
-                        ioNodeMasters.Add((string)dataGridView1.Rows[i].Cells[5].Value);
-                        
+                        ioNodeMasters.Add((string)dt_PulledFromForm.Rows[i][5]);                        
                         break;
 
                     case "PLC":
                         //add interface module
-                        string plcName = (string)dataGridView1.Rows[i].Cells[5].Value;
+                        string plcName = (string)dt_PulledFromForm.Rows[i][5];
                         addDevice(MLFB, plcName, networkAddress, ioType);
                         //add PLC to network connection lists
                         ioControllers_str.Add(plcName);
@@ -156,8 +156,8 @@ namespace TIA_Addin_IO_List_Import
 
                     default:
                         //Assuming IO card needs added
-                        int slot = Convert.ToInt32(dataGridView1.Rows[i].Cells[3].Value);
-                        string cardName = (string)dataGridView1.Rows[i].Cells[1].Value + slot;
+                        int slot = Convert.ToInt32(dt_PulledFromForm.Rows[i][3]); 
+                        string cardName = (string)dt_PulledFromForm.Rows[i][1] + slot;
                         //insert card into rack
                         addCard(MLFB, cardName, rackName, slot);
                         break;
@@ -274,24 +274,23 @@ namespace TIA_Addin_IO_List_Import
             //Create tags for all IO points on the IO list
             for (int i = 0; i < numOfRows - 1; i++)
             {
-                string ioTypeIoList = (string)dataGridView1.Rows[i].Cells[1].Value;
-
+                string ioTypeIoList = (string)dt_PulledFromForm.Rows[i][1];
 
                 //Check to see if current line is an IO channel, if not skip this section
                 if (ioTypeIoList == "DI" || ioTypeIoList == "DO" || ioTypeIoList == "AI" || ioTypeIoList == "AO")
                 {
                     //Acquire current slot per the IO list
-                    string slot_str = (string)dataGridView1.Rows[i].Cells[3].Value;
+                    string slot_str = (string)dt_PulledFromForm.Rows[i][3];
                     int slot = Int32.Parse(slot_str);
                     //Acquire data and access to create tags 
                     //Rack access
-                    string rackName = (string)dataGridView1.Columns[2].HeaderText + (string)dataGridView1.Rows[i].Cells[2].Value;
+                    string rackName = (string)dt_PulledFromForm.Columns[2].ColumnName + (string)dt_PulledFromForm.Rows[i][2];
                     Device ioRack = MyProject.Devices.Find("station" + rackName);
                     //io card access
                     DeviceItem ioCard = ioRack.DeviceItems[slot + 2];
                     DeviceItem ioCardInterface = ioCard.DeviceItems.First();
                     Address addressComp = ioCardInterface.Addresses.First();
-                    String plcName = (string)dataGridView1.Rows[i].Cells[5].Value;
+                    String plcName = (string)dt_PulledFromForm.Rows[i][5];
                     //plc access
                     Device plc = MyProject.Devices.Find("station" + plcName);
                     DeviceItem cpu = plc.DeviceItems.First(de => de.Name == plcName);
@@ -310,8 +309,8 @@ namespace TIA_Addin_IO_List_Import
                     int channelSize = 0;
 
                     //Acquire tag info
-                    int channel = Int32.Parse((string)dataGridView1.Rows[i].Cells[4].Value);
-                    string tagname = (string)dataGridView1.Rows[i].Cells[0].Value;
+                    int channel = Int32.Parse((string)dt_PulledFromForm.Rows[i][4]);
+                    string tagname = (string)dt_PulledFromForm.Rows[i][0];
                     string typeName = (string)ioCard.GetAttribute("TypeName");
                     int cardBitLength = (int)addressComp.Length;
                     string ioType = typeName.Substring(0, 2);
@@ -411,14 +410,14 @@ namespace TIA_Addin_IO_List_Import
                 LogCompileData(result, ioController);
               
             }
-
+            */
             //Close form and return to Portal
             this.Close();
             
 
         }
 
-        public void addDevice(string MLFB, string Name, string[] NetworkAddress, string IoType)
+       /* public void addDevice(string MLFB, string Name, string[] NetworkAddress, string IoType)
         {
             bool found = false;
             string devName = "station" + Name;
@@ -535,72 +534,11 @@ namespace TIA_Addin_IO_List_Import
                 RecursivelyWriteMessages(message.Messages, Log, indent);
             }
         }
-
+       */
         private void btn_AsyncTest_Click(object sender, EventArgs e)
         {
-            if (backgroundWorker1.IsBusy != true)
-            {
-                //Disable button while task running
-                btn_AsyncTest.Enabled = false;
-                tb_Status.Text = "Hardware being created in the background";
-                //Reset progress bar to 0
-                pb_HWProgress.Value = 0;
-                //Acquire data from table to pass to background worker
-                DataTable dt = (DataTable)dataGridView1.DataSource;
-                
-                //test code
-                var valueFromTable = (string)dt.Rows[0][5];
-                Console.WriteLine("the value in the table is: " + valueFromTable);
-
-                //Run background task, see backgroundworker item in design view for called functions
-                backgroundWorker1.RunWorkerAsync(dt);
-            }
-        }
-
-        private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
-        {
-            DataTable dt = (DataTable)e.Argument;
-            string plcName = (string)dt.Rows[0][5];
-            try
-            {
-                Device plc = MyProject.Devices.Find("station" + plcName);
-            }
-            catch(Exception ex)
-            {
-                MessageBox.Show("There was an error: " + ex);
-            }
             
-            /*DeviceItem localRack = plc.DeviceItems.First(de => de.Name == "Rail_0");
-            backgroundWorker1.ReportProgress(25);
-
-            if (localRack.CanPlugNew("OrderNumber:6ES7 521-1BH00-0AB0/V2.2", "DI1", 2))
-                localRack.PlugNew("OrderNumber:6ES7 521-1BH00-0AB0/V2.2", "DI1", 2);
-            else
-                backgroundWorker1.ReportProgress(11);*/
-                      
-            Thread.Sleep(5000);
-            backgroundWorker1.ReportProgress(50);
-            Thread.Sleep(5000);
-            backgroundWorker1.ReportProgress(75);
-            Thread.Sleep(5000);
-            backgroundWorker1.ReportProgress(99);
-
-        }
-
-        private void backgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-            if (e.ProgressPercentage == 11)
-                Console.WriteLine("Adding card failed");
-            
-            pb_HWProgress.Value = e.ProgressPercentage;
-            Console.WriteLine("The data was passed from the table, here it is: " + e.ProgressPercentage);
-        }
-
-        private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            Console.WriteLine("The background worker is finished");
-            btn_AsyncTest.Enabled = true;
-        }
+        }     
 
         private void btn_Test_Click(object sender, EventArgs e)
         {
@@ -618,7 +556,7 @@ namespace TIA_Addin_IO_List_Import
             }
 
             else
-                Console.WriteLine("Fuck you");
+                Console.WriteLine("Whoops...");
         }
     }
 }
