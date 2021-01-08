@@ -73,7 +73,7 @@ namespace TIA_Addin_IO_List_Import
                     case "IM":
 
                         //add interface module
-                        addDevice(MLFB, rackName, networkAddress, ioType);
+                        addDevice(MLFB, rackName, networkAddress, ioType);                        
                         //add rack name to list for network connections
                         ioNodes.Add(rackName);
                         //add the IO controller name to list of network connection lists
@@ -159,7 +159,7 @@ namespace TIA_Addin_IO_List_Import
                 if (plcSoftware is PlcSoftware)
                     Console.WriteLine("The plc software has been selected of PLC Main");
                 else
-                    Console.WriteLine("Get fucked!!!, the selected object is not PLC software");
+                    Console.WriteLine("The selected object is not PLC software");
 
                 PlcTagTable myTable = plcSoftware.TagTableGroup.TagTables.Create("autoGenTags");
 

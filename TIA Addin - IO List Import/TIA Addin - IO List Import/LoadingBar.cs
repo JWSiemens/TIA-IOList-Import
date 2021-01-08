@@ -16,7 +16,14 @@ namespace TIA_Addin_IO_List_Import
         public LoadingBar()
         {
             InitializeComponent();
-            backgroundWorker1.RunWorkerAsync();
+
+            for (int i = 0; i < 10; i++)
+            {
+                Thread.Sleep(1000);
+                pb_BuildingHardware.Value = i * 10;
+            }
+
+            
         }
 
         private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)

@@ -17,6 +17,11 @@ using Siemens.Engineering.HW.Features;
 using Siemens.Engineering.SW;
 using Siemens.Engineering.SW.Tags;
 
+
+
+
+
+
 namespace TIA_Addin_IO_List_Import
 {
     public partial class IOListInterface : Form
@@ -26,6 +31,11 @@ namespace TIA_Addin_IO_List_Import
             get; set;
         }
         public Project MyProject
+        {
+            get; set;
+        }
+
+        public DataTable dataTable
         {
             get; set;
         }
@@ -82,25 +92,30 @@ namespace TIA_Addin_IO_List_Import
             }
         }
 
+        //THis button will be removed and replaced with the contents of the test button...
         private void btn_CreateHW_Click(object sender, EventArgs e)
         {
             //disable read and import button during operation
             btn_CreateHW.Enabled = false;
             btn_ReadCSV.Enabled = false;
 
-            //What I think I actually need is to have dispatch control to allow the UI to be attended to while the hardware is being built -- Remove this code/comment when new method is determined
-            //Make this form invisible until complete, work around to get smooth look to add-in function
-            //this.Opacity = 0.0;
+            //Another attempt at creating a smooth interation, the idea here is to make the current from invisible and call a second on another thread to allow a loading bar to be shown during the build
+            this.Opacity = 0.0;
+            this.ShowInTaskbar = false;
+
+            //new Thread(() => new LoadingBar().ShowDialog()).Start();             
 
             //The following code is used to allow the data in the grid view can be used elsewhere
             DataTable dt_PulledFromForm = new DataTable();
             dt_PulledFromForm = (DataTable)dataGridView1.DataSource;    //Still working on this one..........Going to replace all locations that have datagridview1 to this datatable...............................................................................................
 
-            //Access utility functions
+            //Access utility functions---------------------------------------------------------------------------------
             Util utility = new Util(MyTiaPortal);
-            utility.CreateHW(dt_PulledFromForm);
+            //utility.CreateHW(dt_PulledFromForm, this);
 
-            /*
+           
+
+            //Read comment start to comment out code that has been moved to util
 
             int numOfRows = dt_PulledFromForm.Rows.Count;
             int numOfColumns = dt_PulledFromForm.Columns.Count;
@@ -410,14 +425,17 @@ namespace TIA_Addin_IO_List_Import
                 LogCompileData(result, ioController);
               
             }
-            */
+            
+            
+            // end of first comment out code   */ --------------------------------------------------------------------------------------------------------
+            
             //Close form and return to Portal
             this.Close();
             
 
         }
 
-       /* public void addDevice(string MLFB, string Name, string[] NetworkAddress, string IoType)
+       public void addDevice(string MLFB, string Name, string[] NetworkAddress, string IoType)
         {
             bool found = false;
             string devName = "station" + Name;
@@ -534,7 +552,7 @@ namespace TIA_Addin_IO_List_Import
                 RecursivelyWriteMessages(message.Messages, Log, indent);
             }
         }
-       */
+        // second end to comment out code */ ----------------------------------------------------------------------------------------------------
         private void btn_AsyncTest_Click(object sender, EventArgs e)
         {
             
@@ -543,20 +561,10 @@ namespace TIA_Addin_IO_List_Import
         private void btn_Test_Click(object sender, EventArgs e)
         {
             
-            string plcName = (string)dataGridView1.Rows[0].Cells[5].Value;
-            Console.WriteLine("The name of the plc is " + plcName);
-            Device plc = MyProject.Devices.Find("station" + plcName);
-            DeviceItem localRack = plc.DeviceItems.First(de => de.Name == "Rail_0");
-
-            if (localRack.CanPlugNew("OrderNumber:6ES7 521-1BH00-0AB0/V2.2", "DI1", 2))
-            {
-                Console.WriteLine("Attempting to add card...");
-                localRack.PlugNew("OrderNumber:6ES7 521-1BH00-0AB0/V2.2", "DI1", 2);
-
-            }
-
-            else
-                Console.WriteLine("Whoops...");
+            //Move dataTable to original program
+            dataTable = (DataTable)dataGridView1.DataSource;
+            MessageBox.Show("The first value in the data table is: " + dataTable.Rows[0][0]);
+            this.DialogResult = DialogResult.OK;
         }
     }
 }
