@@ -36,19 +36,19 @@ namespace TIA_Addin_IO_List_Import
             this.tb_Status = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.tb_LogFileLocation = new System.Windows.Forms.TextBox();
-            this.btn_CreateHW = new System.Windows.Forms.Button();
             this.pb_HWProgress = new System.Windows.Forms.ProgressBar();
             this.label3 = new System.Windows.Forms.Label();
-            this.btn_AsyncTest = new System.Windows.Forms.Button();
-            this.btn_Test = new System.Windows.Forms.Button();
+            this.btn_CreateHW = new System.Windows.Forms.Button();
+            this.btn_CreateSample = new System.Windows.Forms.Button();
+            this.btn_SortData = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
             // btn_ReadCSV
             // 
-            this.btn_ReadCSV.Location = new System.Drawing.Point(76, 78);
+            this.btn_ReadCSV.Location = new System.Drawing.Point(76, 31);
             this.btn_ReadCSV.Name = "btn_ReadCSV";
-            this.btn_ReadCSV.Size = new System.Drawing.Size(277, 146);
+            this.btn_ReadCSV.Size = new System.Drawing.Size(277, 43);
             this.btn_ReadCSV.TabIndex = 0;
             this.btn_ReadCSV.Text = "Read CSV File";
             this.btn_ReadCSV.UseVisualStyleBackColor = true;
@@ -67,7 +67,7 @@ namespace TIA_Addin_IO_List_Import
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(22, 264);
+            this.label1.Location = new System.Drawing.Point(22, 190);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(136, 20);
             this.label1.TabIndex = 2;
@@ -75,7 +75,7 @@ namespace TIA_Addin_IO_List_Import
             // 
             // tb_CSVFileLocation
             // 
-            this.tb_CSVFileLocation.Location = new System.Drawing.Point(26, 291);
+            this.tb_CSVFileLocation.Location = new System.Drawing.Point(26, 217);
             this.tb_CSVFileLocation.Name = "tb_CSVFileLocation";
             this.tb_CSVFileLocation.Size = new System.Drawing.Size(411, 26);
             this.tb_CSVFileLocation.TabIndex = 3;
@@ -106,17 +106,6 @@ namespace TIA_Addin_IO_List_Import
             this.tb_LogFileLocation.TabIndex = 6;
             this.tb_LogFileLocation.Text = "H:\\VersionControlSpace\\io-list-import-tia-add-in\\Compile Logs";
             // 
-            // btn_CreateHW
-            // 
-            this.btn_CreateHW.Enabled = false;
-            this.btn_CreateHW.Location = new System.Drawing.Point(76, 532);
-            this.btn_CreateHW.Name = "btn_CreateHW";
-            this.btn_CreateHW.Size = new System.Drawing.Size(277, 124);
-            this.btn_CreateHW.TabIndex = 7;
-            this.btn_CreateHW.Text = "Create HW from IO List";
-            this.btn_CreateHW.UseVisualStyleBackColor = true;
-            this.btn_CreateHW.Click += new System.EventHandler(this.btn_CreateHW_Click);
-            // 
             // pb_HWProgress
             // 
             this.pb_HWProgress.Location = new System.Drawing.Point(496, 614);
@@ -133,36 +122,47 @@ namespace TIA_Addin_IO_List_Import
             this.label3.TabIndex = 9;
             this.label3.Text = "Progress of Harware Build:";
             // 
-            // btn_AsyncTest
+            // btn_CreateHW
             // 
-            this.btn_AsyncTest.Location = new System.Drawing.Point(926, 472);
-            this.btn_AsyncTest.Name = "btn_AsyncTest";
-            this.btn_AsyncTest.Size = new System.Drawing.Size(348, 112);
-            this.btn_AsyncTest.TabIndex = 10;
-            this.btn_AsyncTest.Text = "Create HW Asynchronosly";
-            this.btn_AsyncTest.UseVisualStyleBackColor = true;
-            this.btn_AsyncTest.Click += new System.EventHandler(this.btn_AsyncTest_Click);
+            this.btn_CreateHW.Location = new System.Drawing.Point(76, 538);
+            this.btn_CreateHW.Name = "btn_CreateHW";
+            this.btn_CreateHW.Size = new System.Drawing.Size(277, 134);
+            this.btn_CreateHW.TabIndex = 11;
+            this.btn_CreateHW.Text = "Create Hardware";
+            this.btn_CreateHW.UseVisualStyleBackColor = true;
+            this.btn_CreateHW.Click += new System.EventHandler(this.btn_CreateHW_Click);
             // 
-            // btn_Test
+            // btn_CreateSample
             // 
-            this.btn_Test.Location = new System.Drawing.Point(714, 478);
-            this.btn_Test.Name = "btn_Test";
-            this.btn_Test.Size = new System.Drawing.Size(103, 54);
-            this.btn_Test.TabIndex = 11;
-            this.btn_Test.Text = "Test";
-            this.btn_Test.UseVisualStyleBackColor = true;
-            this.btn_Test.Click += new System.EventHandler(this.btn_Test_Click);
+            this.btn_CreateSample.Location = new System.Drawing.Point(76, 305);
+            this.btn_CreateSample.Name = "btn_CreateSample";
+            this.btn_CreateSample.Size = new System.Drawing.Size(277, 68);
+            this.btn_CreateSample.TabIndex = 12;
+            this.btn_CreateSample.Text = "Create Sample CSV";
+            this.btn_CreateSample.UseVisualStyleBackColor = true;
+            this.btn_CreateSample.Click += new System.EventHandler(this.btn_CreateSample_Click);
+            // 
+            // btn_SortData
+            // 
+            this.btn_SortData.Location = new System.Drawing.Point(76, 115);
+            this.btn_SortData.Name = "btn_SortData";
+            this.btn_SortData.RightToLeft = System.Windows.Forms.RightToLeft.No;
+            this.btn_SortData.Size = new System.Drawing.Size(277, 40);
+            this.btn_SortData.TabIndex = 13;
+            this.btn_SortData.Text = "Sort Data";
+            this.btn_SortData.UseVisualStyleBackColor = true;
+            this.btn_SortData.Click += new System.EventHandler(this.btn_SortData_Click);
             // 
             // IOListInterface
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1426, 753);
-            this.Controls.Add(this.btn_Test);
-            this.Controls.Add(this.btn_AsyncTest);
+            this.Controls.Add(this.btn_SortData);
+            this.Controls.Add(this.btn_CreateSample);
+            this.Controls.Add(this.btn_CreateHW);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.pb_HWProgress);
-            this.Controls.Add(this.btn_CreateHW);
             this.Controls.Add(this.tb_LogFileLocation);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.tb_Status);
@@ -187,10 +187,10 @@ namespace TIA_Addin_IO_List_Import
         private System.Windows.Forms.TextBox tb_Status;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox tb_LogFileLocation;
-        private System.Windows.Forms.Button btn_CreateHW;
         private System.Windows.Forms.ProgressBar pb_HWProgress;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Button btn_AsyncTest;
-        private System.Windows.Forms.Button btn_Test;
+        private System.Windows.Forms.Button btn_CreateHW;
+        private System.Windows.Forms.Button btn_CreateSample;
+        private System.Windows.Forms.Button btn_SortData;
     }
 }

@@ -34,11 +34,348 @@ namespace TIA_Addin_IO_List_Import
 
         public Util(TiaPortal tiaPortal)
         {
-            
-
             //Move project info to the form
             MyTiaPortal = tiaPortal;
             MyProject = MyTiaPortal.Projects.First();
+        }
+
+        public List<string> CreatePLCs(DataTable dt)  //Changing to create PLCs
+        {
+            string expression = "[IO Type] = 'PLC'";
+            //Find all rows in data table that "IO Type" is "PLC"
+            DataRow[] foundRows = dt.Select(expression);                
+
+            //Derive list of PLCs from incoming dataTable
+            List<string> ioControllers_str = new List<string>();
+            Console.WriteLine("The number of found rows is " + foundRows.Length);
+            for (int i = 0; i < foundRows.Length; i++)
+            {
+                //add plcs to controller list
+                ioControllers_str.Add(foundRows[i]["PLC"].ToString());
+                Console.WriteLine(foundRows[i]["PLC"] + " has been added to the list");
+
+                //Define attributes of new PLC
+                string plcName = (string)foundRows[i][5];                
+                string MLFB = "OrderNumber:" + (string)foundRows[i][7] + "/" + (string)foundRows[i][8];
+                string[] networkAddress = { "", "", "" }; //order of this array is: IPAddress, SubnetMask, Gateway(gateway only used for controllers)
+                networkAddress[0] = (string)foundRows[i][9];   //IPAddress
+                networkAddress[1] = (string)foundRows[i][10];  //Subnet Mask
+                networkAddress[2] = (string)foundRows[i][11];  //Default Gateway
+                addDevice(MLFB, plcName, networkAddress, "PLC");
+            }
+
+            return ioControllers_str;
+        }
+
+        public List<string>[] CreateIMs(DataTable dt)    //create all IM devices
+        {
+            List<string>[] ioNodes = new List<string>[2];     //IO Nodes are on list 0 and io node masters are on list 1
+            ioNodes[0] = new List<string>();
+            ioNodes[1] = new List<string>();
+
+            //filter list to just IM's
+            DataRow[] foundRows = dt.Select("[IO Type] = 'IM'");
+            //Define prefix of IM (typically rack but can be changed
+            string imPrefix = (string)dt.Columns[2].ColumnName;
+
+            Console.WriteLine("The number of found row is " + foundRows.Length);
+            for (int i = 0; i < foundRows.Length; i++)
+            {
+                Console.WriteLine("The for loop is running");
+                //IO Node to the list
+                ioNodes[0].Add(imPrefix + foundRows[i][2]);
+                Console.Write("The im has been added to the list");
+                //Add IO Node masters to associated list
+                ioNodes[1].Add(foundRows[i]["PLC"].ToString());
+                Console.WriteLine(imPrefix + foundRows[i][imPrefix] + " has been added to the list \n" +
+                    foundRows[i]["PLC"] + " is the master of the added node");
+
+                //Collect part data, for it to work the MLFB takes this format: OrderNumber:MLFB#/FirmwareVersion
+                string MLFB = "OrderNumber:" + (string)foundRows[i][7] + "/" + (string)foundRows[i][8];
+                //Read io Type per io list
+                string ioType = (string)foundRows[i][1];
+                //create rack name
+                string rackName = imPrefix + (string)foundRows[i][2];
+                //Acquire IP, subnet mask, and default gateway
+                string[] networkAddress = { "", "", "" }; //order of this array is: IPAddress, SubnetMask, Gateway(gateway only used for controllers)
+                networkAddress[0] = (string)foundRows[i][9];   //IPAddress
+                networkAddress[1] = (string)foundRows[i][10];  //Subnet Mask
+                networkAddress[2] = (string)foundRows[i][11];  //Default Gateway
+
+                addDevice(MLFB, rackName, networkAddress, ioType);
+
+            }
+            
+            return ioNodes;
+        }
+
+        public void SortAndAddCards(DataTable dt)
+        {
+            //Track cards being added with list
+            List<string> addedCards = new List<string>();
+
+            //Filter list for IO cards
+            DataRow[] foundRows = dt.Select("[IO Type] = 'DI' OR [IO Type] = 'DO' OR [IO Type] = 'AI' OR [IO Type] = 'AO'");  //Filters for standard IO cards, need to expand for more types 
+
+            for (int i=0; i < foundRows.Length; i++)
+            {
+                //Collect part data, for it to work the MLFB takes this format: OrderNumber:MLFB#/FirmwareVersion
+                string MLFB = "OrderNumber:" + foundRows[i][7] + "/" + foundRows[i][8];
+                //Read io Type per io list
+                string ioType = (string)foundRows[i][1];
+                //create rack name
+                string rackName = (string)dt.Columns[2].ColumnName + foundRows[i][2];
+                //Create card name
+                int slot = Convert.ToInt32(foundRows[i][3]);
+                string cardName = (string)foundRows[i][1] + slot;
+                //insert card into rack
+                addCard(MLFB, cardName, rackName, slot);
+            }
+        }
+
+
+        public void CreateNetworks(List<string> ioControllers_str, List<string>[] ioNodes)
+        {
+            
+            //Create then connect new devices to network
+            //Access project subnets
+            SubnetComposition subnets = MyProject.Subnets;
+
+            //Check to see if the subnet already exists, if not create it
+            Subnet subnet1 = subnets.Find("subnet1");
+            if (subnet1 == null)
+                subnet1 = subnets.Create("System:Subnet.Ethernet", "subnet1");
+
+            //Connect all created PLCs to subnet1, then create an IO System for each to allow connection to io
+            foreach (string controller in ioControllers_str)
+            {
+                //define access PLC and network interface
+                Device plc = MyProject.Devices.Find("station" + controller);
+                var cpu = plc.DeviceItems.First(de => de.Name == controller);
+                var profiCpuModul = cpu.DeviceItems.First(de => de.Name == "PROFINET interface_1");
+                var profiCpuInterface = profiCpuModul.GetService<NetworkInterface>();
+                var profiCpuNode = profiCpuInterface.Nodes.First(n => n.Name == "X1");
+
+                //Connect to subnet
+                profiCpuNode.ConnectToSubnet(subnet1);
+
+                //Create IO system for controller
+                IoSystem ioSystem = null;
+                if ((profiCpuInterface.InterfaceOperatingMode & InterfaceOperatingModes.IoController) != 0)
+                {
+                    IoControllerComposition ioControllers = profiCpuInterface.IoControllers;
+                    IoController ioController = ioControllers.First();
+
+                    //debug code---------------------------------------------------
+                    Console.WriteLine("The io controller (" + controller + ") has been selected");
+                    //-------------------------------------------------------------
+
+                    if (ioController != null)
+                    {
+                        ioSystem = ioController.CreateIoSystem("IO System " + controller);
+
+
+                        //Debug code ---------------------------------------------------
+                        Console.WriteLine("The io system (" + controller + ") has been created");
+                    }
+                    else
+                        Console.WriteLine("The io system was not created, check device name: " + controller);
+
+                }
+
+
+                //Create tag table for auto gen tags, to populate tags after nodes are connected to the IO system
+                //Acquire access to software of PLC
+                SoftwareContainer plcSoftwareContainer = cpu.GetService<SoftwareContainer>();
+                PlcSoftware plcSoftware = plcSoftwareContainer.Software as PlcSoftware;
+                //Verify that the plc software has been selected
+                if (plcSoftware is PlcSoftware)
+                    Console.WriteLine("The plc software has been selected of PLC Main");
+                else
+                    Console.WriteLine("The selected object is not PLC software");
+
+                PlcTagTable myTable = plcSoftware.TagTableGroup.TagTables.Create("autoGenTags");
+
+            }
+
+            for (int i = 0; i < ioNodes[0].Count; i++)
+            {
+
+                //connect IO module then set to be controlled by assigned plc
+                //Define access to rack interfaces
+                Device ioRack = MyProject.Devices.Find("station" + ioNodes[0][i]);
+                var ioInterface = ioRack.DeviceItems.First(de => de.Name == ioNodes[0][i]);
+                var profiModul = ioInterface.DeviceItems.First(de => de.Name == "PROFINET interface");
+                var profiInterface = profiModul.GetService<NetworkInterface>();
+                var profiIMNode = profiInterface.Nodes.First();
+
+                //Connect rack to subnet
+                profiIMNode.ConnectToSubnet(subnet1);
+
+                //create io system name to connect to
+                string ioSystemName = "io system " + ioNodes[1][i];
+
+                //define access to IO system
+                Device plc = MyProject.Devices.Find("station" + ioNodes[1][i]);
+                DeviceItem cpu = plc.DeviceItems.First(de => de.Name == ioNodes[1][i]);
+                DeviceItem profiCpuModul = cpu.DeviceItems.First(de => de.Name == "PROFINET interface_1");
+                NetworkInterface profiCpuInterface = profiCpuModul.GetService<NetworkInterface>();
+
+                IoControllerComposition ioControllers = profiCpuInterface.IoControllers;
+                IoController ioController = ioControllers.First();
+
+                IoSystem ioSystem = ioController.IoSystem;
+
+                //assign to ioController(io system)
+                profiInterface.IoConnectors[0].ConnectToIoSystem(ioSystem);
+
+            }
+        }
+
+        public void CreateIOTags(DataTable dt)
+        {
+            int numOfRows = dt.Rows.Count;
+            //Create tags for all IO points on the IO list
+            for (int i = 0; i < numOfRows - 1; i++)
+            {
+                string ioTypeIoList = (string)dt.Rows[i][1];
+                Console.WriteLine("The program made it this far, the for loop is on round: " + i);
+                //Check to see if current line is an IO channel, if not skip this section
+                if (ioTypeIoList == "DI" || ioTypeIoList == "DO" || ioTypeIoList == "AI" || ioTypeIoList == "AO")
+                {
+                    
+                    //Acquire current slot per the IO list
+                    string slot_str = (string)dt.Rows[i][3];
+                    int slot = Int32.Parse(slot_str);
+                    //Acquire data and access to create tags 
+                    //Rack access
+                    string rackName = (string)dt.Columns[2].ColumnName + (string)dt.Rows[i][2];
+                    Device ioRack = MyProject.Devices.Find("station" + rackName);
+                    //io card access
+                    DeviceItem ioCard = ioRack.DeviceItems[slot + 2];
+                    DeviceItem ioCardInterface = ioCard.DeviceItems.First();
+                    Address addressComp = ioCardInterface.Addresses.First();
+                    String plcName = (string)dt.Rows[i][5];
+
+                    
+
+                    //plc access
+                    Device plc = MyProject.Devices.Find("station" + plcName);
+                    DeviceItem cpu = plc.DeviceItems.First(de => de.Name == plcName);
+                    //software access
+                    SoftwareContainer plcSoftwareContainer = cpu.GetService<SoftwareContainer>();
+                    PlcSoftware plcSoftware = plcSoftwareContainer.Software as PlcSoftware;
+                    //Verify that the plc software has been selected
+                    if (plcSoftware is PlcSoftware)
+                        Console.WriteLine("The plc software has been selected of " + plcName);
+                    else
+                        Console.WriteLine("The object selected is not PLC software");
+
+                    //read startAddress
+                    int startAddress = (int)addressComp.StartAddress;
+                    string channelAddress = "";
+                    int channelSize = 0;
+
+                    //Acquire tag info
+                    int channel = Int32.Parse((string)dt.Rows[i][4]);
+                    string tagname = (string)dt.Rows[i][0];
+                    string typeName = (string)ioCard.GetAttribute("TypeName");
+                    int cardBitLength = (int)addressComp.Length;
+                    string ioType = typeName.Substring(0, 2);
+                    int numChannels = Int32.Parse(typeName.Substring(2, 2));
+
+
+                    //Find the created tag table
+                    PlcTagTable autoGenTagTable = plcSoftware.TagTableGroup.TagTables.Find("autoGenTags");
+                    //tagComposition composes tags...
+                    PlcTagComposition tagComposition = autoGenTagTable.Tags;
+                    string dataType = "";
+                    int channelStartAddress = channelSize * channel;
+                    int numBytes = channelStartAddress / 8;
+                    int bitAdjust = channelStartAddress - (numBytes * 8);
+
+                    switch (ioType)
+                    {
+                        case "DI":
+                            dataType = "Bool";
+                            if (numChannels <= 8 || channel <= 8)
+                                channelAddress = "%I" + startAddress + "." + channel;
+                            else if (channel <= 16)
+                            {
+                                startAddress = startAddress + 1;
+                                channel = channel - 8;
+                                channelAddress = "%I" + startAddress + "." + channel;
+                            }
+                            break;
+
+                        case "DQ":
+                            dataType = "Bool";
+                            if (numChannels <= 8 || channel <= 8)
+                                channelAddress = "%Q" + startAddress + "." + channel;
+                            else if (channel <= 16)
+                            {
+                                startAddress = startAddress + 1;
+                                channel = channel - 8;
+                                channelAddress = "%Q" + startAddress + "." + channel;
+                            }
+                            break;
+
+                        case "AI":
+                            dataType = "Word";
+                            //calculate channel size (AI and AO are ususally 1 word but doing the calculation to make sure)
+                            channelSize = cardBitLength / numChannels;
+                            //Calculate the byte address of the channel
+                            channelStartAddress = channelSize * channel;
+                            //find number of bytes from start bit address
+                            numBytes = channelStartAddress / 8;
+
+                            //Offset start address for channel
+                            startAddress = startAddress + numBytes;
+                            //Combine address for tag command
+                            channelAddress = "%IW" + startAddress;
+                            break;
+
+                        case "AQ":
+                            dataType = "Word";
+                            //calculate channel size (AI and AO are ususally 1 word but doing the calculation to make sure)
+                            channelSize = cardBitLength / numChannels;
+                            //Calculate the byte address of the channel
+                            channelStartAddress = channelSize * channel;
+                            //find number of bytes from start bit address
+                            numBytes = channelStartAddress / 8;
+
+                            //Offset start address for channel
+                            startAddress = startAddress + numBytes;
+                            //Combine address for tag command
+                            channelAddress = "%QW" + startAddress;
+                            break;
+
+                    }
+
+                    //Create tag
+                    tagComposition.Create(tagname, dataType, channelAddress);
+                    Console.WriteLine(tagname + " tag has been created and is assigned to: " + channelAddress);
+
+                    //increm
+                }
+                //increment progress bar
+                //if (i % 4 == 0)
+                //pb_HWProgress.Value = pb_HWProgress.Value + 1;
+
+            }
+        }
+
+        public void CompilePLCs(string ioController)
+        {
+            //Define Access to ioCOntrollers
+            Device plc = MyProject.Devices.Find("station" + ioController);
+            DeviceItem cpu = plc.DeviceItems.First(de => de.Name == ioController);
+
+            //Access compilable part of controller and compile hardware
+            ICompilable compileService = plc.GetService<ICompilable>();
+            CompilerResult result = compileService.Compile();
+            //Capture compile data
+            LogCompileData(result, ioController);
         }
 
         public void CreateHW(DataTable dt)
@@ -344,7 +681,7 @@ namespace TIA_Addin_IO_List_Import
                 LogCompileData(result, ioController);
 
             }
-        }
+        }       //THis function has been replaced, to be deleted
 
 
         public void addDevice(string MLFB, string Name, string[] NetworkAddress, string IoType)
@@ -405,7 +742,7 @@ namespace TIA_Addin_IO_List_Import
             }
         }
 
-        //JW created function
+
         public void addCard(string MLFB, string CardName, string RackName, int Slot)
         {
             try

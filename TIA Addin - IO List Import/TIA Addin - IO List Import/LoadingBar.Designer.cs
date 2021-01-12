@@ -38,6 +38,7 @@ namespace TIA_Addin_IO_List_Import
             this.pb_BuildingHardware.Location = new System.Drawing.Point(41, 35);
             this.pb_BuildingHardware.Name = "pb_BuildingHardware";
             this.pb_BuildingHardware.Size = new System.Drawing.Size(680, 72);
+            this.pb_BuildingHardware.Style = System.Windows.Forms.ProgressBarStyle.Marquee;
             this.pb_BuildingHardware.TabIndex = 0;
             // 
             // backgroundWorker1
@@ -45,14 +46,14 @@ namespace TIA_Addin_IO_List_Import
             this.backgroundWorker1.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker1_DoWork);
             this.backgroundWorker1.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.backgroundWorker1_ProgressChanged);
             // 
-            // Form1
+            // LoadingBar
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(783, 140);
             this.Controls.Add(this.pb_BuildingHardware);
             this.Cursor = System.Windows.Forms.Cursors.WaitCursor;
-            this.Name = "Form1";
+            this.Name = "LoadingBar";
             this.Text = "Form1";
             this.ResumeLayout(false);
 
