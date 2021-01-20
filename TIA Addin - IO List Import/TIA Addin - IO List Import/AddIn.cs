@@ -59,9 +59,16 @@ namespace TIA_Addin_IO_List_Import
                     dt = form1.dataTable;
                     MessageBox.Show("The datatable transfer just happened the first header is: " + dt.Columns[0].ColumnName);
                 }
+                //Create new thread and call loading bar in it to give user indication of progress
+                Thread loadingBarThread = new Thread(CallLoadingBar);
+                loadingBarThread.Start(1000);
             }
 
-            
+            //Create new thread and call loading bar in it to give user indication of progress
+            //Thread loadingBarThread = new Thread(CallLoadingBar);
+            //loadingBarThread.Start(1000);
+
+
             //Create datatable to compare to the import to make sure the correct headers are used
             DataTable compareDT = new DataTable();
             compareDT.Columns.Add("Tagname");   //during the transfer the text changes to all lower case            
@@ -139,7 +146,7 @@ namespace TIA_Addin_IO_List_Import
             return selection;
         }
 
-        private void callLoadingBar()
+        private void CallLoadingBar(Object data)
         {
             LoadingBar loadingBarForm = new LoadingBar();
             loadingBarForm.Text = "IO Import Progress";

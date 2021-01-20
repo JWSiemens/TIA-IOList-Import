@@ -94,11 +94,9 @@ namespace TIA_Addin_IO_List_Import
       
 
         private void btn_CreateHW_Click(object sender, EventArgs e)
-        {
-            
+        {            
             //Move dataTable to original program
             dataTable = (DataTable)dataGridView1.DataSource;
-            MessageBox.Show("The first value in the data table is: " + dataTable.Rows[0][0]);
             this.DialogResult = DialogResult.OK;
         }
 
@@ -135,7 +133,7 @@ namespace TIA_Addin_IO_List_Import
             dt.Dispose();
         }
 
-        private void btn_SortData_Click(object sender, EventArgs e)
+        private void btn_CreateHWMethod2_Click(object sender, EventArgs e)
         {
             Util myUtil = new Util(MyTiaPortal);             
             DataTable dt = (DataTable)dataGridView1.DataSource;
@@ -175,6 +173,34 @@ namespace TIA_Addin_IO_List_Import
                 Console.WriteLine(controller + " is on the PLC list");
             }
             this.Close();
+        }
+
+
+        //Create folder dialog outside of function to pass back and forth
+        FolderBrowserDialog folderDialog = new FolderBrowserDialog();
+        private void btn_FolderDialog_Click(object sender, EventArgs e)
+        {
+            //FolderBrowserDialog folderDialog = new FolderBrowserDialog();
+            folderDialog.ShowNewFolderButton = true;
+            folderDialog.RootFolder = Environment.SpecialFolder.Desktop;            
+            DialogResult result = folderDialog.ShowDialog();
+            if (result == DialogResult.OK)
+            {
+                tb_CSVFileLocation.Text = folderDialog.SelectedPath;
+                                
+            }
+        }
+
+        private void tb_LogFileLocation_Click(object sender, EventArgs e)
+        {
+            //FolderBrowserDialog folderDialog = new FolderBrowserDialog();
+            folderDialog.ShowNewFolderButton = true;
+            DialogResult result = folderDialog.ShowDialog();
+            if (result == DialogResult.OK)
+            {
+                tb_CSVFileLocation.Text = folderDialog.SelectedPath;
+
+            }
         }
     }
 }
