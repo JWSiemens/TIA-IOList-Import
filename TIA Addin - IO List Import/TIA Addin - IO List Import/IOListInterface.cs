@@ -133,51 +133,11 @@ namespace TIA_Addin_IO_List_Import
             dt.Dispose();
         }
 
-        private void btn_CreateHWMethod2_Click(object sender, EventArgs e)
-        {
-            Util myUtil = new Util(MyTiaPortal);             
-            DataTable dt = (DataTable)dataGridView1.DataSource;
-            List<string> listOfPLCs = new List<string>();
-            List<string>[] listOfNodes = new List<string>[2];
-            listOfNodes[0] = new List<string>();
-            listOfNodes[1] = new List<string>();            
-            listOfPLCs = myUtil.CreatePLCs(dt);
-            pb_HWProgress.Value = 25;
-            listOfNodes = myUtil.CreateIMs(dt);
-            pb_HWProgress.Value = 50;
-            myUtil.SortAndAddCards(dt);
-            pb_HWProgress.Value = 65;
-            myUtil.CreateNetworks(listOfPLCs, listOfNodes);
-            pb_HWProgress.Value = 75;
-            myUtil.CreateIOTags(dt);
-            
-            foreach (string controller in listOfPLCs)
-            {
-                myUtil.CompilePLCs(controller);
-                pb_HWProgress.Value = pb_HWProgress.Value + 5;
-            }
-
-            //Debug code, shows what is being added
-            foreach (string controller in listOfPLCs)
-            {
-                Console.WriteLine(controller + " is on the PLC list");
-            }
-
-            foreach (string controller in listOfNodes[0])
-            {
-                Console.WriteLine(controller + " is on the PLC list");
-            }
-
-            foreach (string controller in listOfNodes[1])
-            {
-                Console.WriteLine(controller + " is on the PLC list");
-            }
-            this.Close();
-        }
-
 
         //Create folder dialog outside of function to pass back and forth
         FolderBrowserDialog folderDialog = new FolderBrowserDialog();
+
+
         private void btn_FolderDialog_Click(object sender, EventArgs e)
         {
             //FolderBrowserDialog folderDialog = new FolderBrowserDialog();

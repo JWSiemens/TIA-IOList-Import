@@ -52,21 +52,19 @@ namespace TIA_Addin_IO_List_Import
                 //Update title of form
                 form1.Text = "IO Import Tool";
                 //Place form on top of Portal Window
-                form1.TopMost = true;
+                form1.TopMost = true;                
                 var result = form1.ShowDialog();
                 if (result == DialogResult.OK)
                 {                   
-                    dt = form1.dataTable;
-                    MessageBox.Show("The datatable transfer just happened the first header is: " + dt.Columns[0].ColumnName);
-                }
-                //Create new thread and call loading bar in it to give user indication of progress
-                Thread loadingBarThread = new Thread(CallLoadingBar);
-                loadingBarThread.Start(1000);
+                    dt = form1.dataTable;                    
+                }               
             }
 
             //Create new thread and call loading bar in it to give user indication of progress
-            //Thread loadingBarThread = new Thread(CallLoadingBar);
-            //loadingBarThread.Start(1000);
+            Thread loadingBarThread = new Thread(CallLoadingBar);
+            loadingBarThread.IsBackground = true;
+            int loadingBarTime = dt.Rows.Count * 3;
+            loadingBarThread.Start(loadingBarTime);
 
 
             //Create datatable to compare to the import to make sure the correct headers are used
@@ -125,7 +123,11 @@ namespace TIA_Addin_IO_List_Import
             else
             {
                 MessageBox.Show("No data available");
-            }                       
+            }
+
+            //Close app after executing
+            Application.Exit();
+            
         }
 
         private MenuStatus DisplayStatus(MenuSelectionProvider<IEngineeringObject> menuSelectionProvider)
@@ -148,7 +150,8 @@ namespace TIA_Addin_IO_List_Import
 
         private void CallLoadingBar(Object data)
         {
-            LoadingBar loadingBarForm = new LoadingBar();
+            int loadingTime = Convert.ToInt32(data);
+            LoadingBar loadingBarForm = new LoadingBar(loadingTime);
             loadingBarForm.Text = "IO Import Progress";
             loadingBarForm.TopMost = true;
             loadingBarForm.ShowDialog();

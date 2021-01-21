@@ -13,32 +13,41 @@ namespace TIA_Addin_IO_List_Import
 {
     public partial class LoadingBar : Form
     {
-        public LoadingBar()
+
+        int loadingBarTime = 0;
+        public LoadingBar(int loadingTime)
         {
             InitializeComponent();
+            backgroundWorker1.WorkerReportsProgress = true;
+            backgroundWorker1.WorkerSupportsCancellation = true;
+            loadingBarTime = loadingTime;
+            //Set length of loading bar            
+            pb_BuildingHardware.Maximum = loadingBarTime;
 
-            for (int i = 0; i < 10; i++)
-            {
-                Thread.Sleep(1000);
-                pb_BuildingHardware.Value = i * 10;
-            }
+        }
 
-            
+        private void LoadingBar_Shown(object sender, EventArgs e)
+        {
+            backgroundWorker1.RunWorkerAsync();                       
         }
 
         private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
         {
-            for (int i =0; i<10; i++)
+            for (int i = 0; i < loadingBarTime; i++)
             {
                 Thread.Sleep(500);
-                backgroundWorker1.ReportProgress(i * 10);
+                backgroundWorker1.ReportProgress(i);
             }
-            
         }
 
         private void backgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             pb_BuildingHardware.Value = e.ProgressPercentage;
+        }
+
+        private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            this.Close();
         }
     }
 }
