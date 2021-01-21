@@ -2,73 +2,73 @@ State:Warning
 Warning Count:2
 Error Count:0
 	Path: Line
-	DateTime: 12/21/2020 11:31:21 PM
+	DateTime: 1/8/2021 10:54:31 PM
 	State: Warning
 	Description: 
 	Warning Count: 2
 	Error Count: 0
 		Path: Hardware configuration
-		DateTime: 12/21/2020 11:31:21 PM
+		DateTime: 1/8/2021 10:54:31 PM
 		State: Warning
 		Description: 
 		Warning Count: 2
 		Error Count: 0
 			Path: stationLine
-			DateTime: 12/21/2020 11:31:21 PM
+			DateTime: 1/8/2021 10:54:32 PM
 			State: Warning
 			Description:  
 			Warning Count: 2
 			Error Count: 0
 				Path: Rail_0
-				DateTime: 12/21/2020 11:31:21 PM
+				DateTime: 1/8/2021 10:54:32 PM
 				State: Warning
 				Description:  
 				Warning Count: 2
 				Error Count: 0
 					Path: Line
-					DateTime: 12/21/2020 11:31:21 PM
+					DateTime: 1/8/2021 10:54:32 PM
 					State: Warning
 					Description:  
 					Warning Count: 2
 					Error Count: 0
 						Path: Line
-						DateTime: 12/21/2020 11:31:21 PM
+						DateTime: 1/8/2021 10:54:32 PM
 						State: Warning
 						Description:  
 						Warning Count: 1
 						Error Count: 0
 							Path: 
-							DateTime: 12/21/2020 11:31:21 PM
+							DateTime: 1/8/2021 10:54:32 PM
 							State: Warning
 							Description: Line does not contain a configured protection level
 							Warning Count: 1
 							Error Count: 0
 						Path: CPU display_1
-						DateTime: 12/21/2020 11:31:21 PM
+						DateTime: 1/8/2021 10:54:32 PM
 						State: Warning
 						Description:  
 						Warning Count: 1
 						Error Count: 0
 							Path: 
-							DateTime: 12/21/2020 11:31:21 PM
+							DateTime: 1/8/2021 10:54:32 PM
 							State: Warning
 							Description: The S7-1500 CPU display does not contain any password protection.
 							Warning Count: 1
 							Error Count: 0
 		Path: Program blocks
-		DateTime: 12/21/2020 11:31:22 PM
+		DateTime: 1/8/2021 10:54:33 PM
 		State: Success
 		Description: 
 		Warning Count: 0
 		Error Count: 0
 			Path: Main (OB1)
-			DateTime: 12/21/2020 11:31:22 PM
+			DateTime: 1/8/2021 10:54:33 PM
 			State: Success
 			Description: Block was successfully compiled.
 			Warning Count: 0
 			Error Count: 0
 	Path: 
-	DateTime: 12/21/2020 11:31:23 PM
+	DateTime: 1/8/2021 10:54:33 PM
 	State: Warning
 	Description: Compiling finished (errors: 0; warnings: 2)
 	Warning Count: 1

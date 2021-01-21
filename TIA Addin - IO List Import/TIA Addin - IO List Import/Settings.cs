@@ -4,7 +4,7 @@ using System;
 using System.IO;
 using System.Xml.Serialization;
 
-namespace TIA_Addin___IO_List_Import
+namespace TIA_Addin_IO_List_Import
 {
     public class Settings
     {
