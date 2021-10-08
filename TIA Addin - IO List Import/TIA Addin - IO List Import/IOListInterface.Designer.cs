@@ -39,15 +39,17 @@ namespace TIA_Addin_IO_List_Import
             this.tb_LogFileLocation = new System.Windows.Forms.TextBox();
             this.btn_CreateHW = new System.Windows.Forms.Button();
             this.btn_CreateSample = new System.Windows.Forms.Button();
+            this.btnIOListLocDialog = new System.Windows.Forms.Button();
+            this.btnLogLocationDialog = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
             // btn_ReadCSV
             // 
-            this.btn_ReadCSV.Location = new System.Drawing.Point(68, 23);
+            this.btn_ReadCSV.Location = new System.Drawing.Point(76, 29);
             this.btn_ReadCSV.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.btn_ReadCSV.Name = "btn_ReadCSV";
-            this.btn_ReadCSV.Size = new System.Drawing.Size(246, 81);
+            this.btn_ReadCSV.Size = new System.Drawing.Size(277, 101);
             this.btn_ReadCSV.TabIndex = 0;
             this.btn_ReadCSV.Text = "Read CSV File";
             this.btn_ReadCSV.UseVisualStyleBackColor = true;
@@ -56,67 +58,65 @@ namespace TIA_Addin_IO_List_Import
             // dataGridView1
             // 
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Location = new System.Drawing.Point(427, 10);
+            this.dataGridView1.Location = new System.Drawing.Point(480, 12);
             this.dataGridView1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowHeadersWidth = 62;
             this.dataGridView1.RowTemplate.Height = 28;
-            this.dataGridView1.Size = new System.Drawing.Size(755, 303);
+            this.dataGridView1.Size = new System.Drawing.Size(849, 379);
             this.dataGridView1.TabIndex = 1;
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(20, 142);
+            this.label1.Location = new System.Drawing.Point(22, 178);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(114, 16);
+            this.label1.Size = new System.Drawing.Size(136, 20);
             this.label1.TabIndex = 2;
             this.label1.Text = "CSV File Location";
             // 
             // tb_CSVFileLocation
             // 
-            this.tb_CSVFileLocation.Location = new System.Drawing.Point(23, 163);
+            this.tb_CSVFileLocation.Location = new System.Drawing.Point(26, 204);
             this.tb_CSVFileLocation.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tb_CSVFileLocation.Name = "tb_CSVFileLocation";
-            this.tb_CSVFileLocation.Size = new System.Drawing.Size(334, 22);
+            this.tb_CSVFileLocation.Size = new System.Drawing.Size(375, 26);
             this.tb_CSVFileLocation.TabIndex = 3;
             this.tb_CSVFileLocation.Text = "H:\\VersionControlSpace\\io-list-import-tia-add-in\\IO List\\IO List Template.csv";
-            this.tb_CSVFileLocation.Click += new System.EventHandler(this.btn_FolderDialog_Click);
             // 
             // tb_Status
             // 
             this.tb_Status.Enabled = false;
-            this.tb_Status.Location = new System.Drawing.Point(10, 329);
+            this.tb_Status.Location = new System.Drawing.Point(11, 411);
             this.tb_Status.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tb_Status.Name = "tb_Status";
-            this.tb_Status.Size = new System.Drawing.Size(1172, 22);
+            this.tb_Status.Size = new System.Drawing.Size(1318, 26);
             this.tb_Status.TabIndex = 4;
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(32, 359);
+            this.label2.Location = new System.Drawing.Point(36, 449);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(110, 16);
+            this.label2.Size = new System.Drawing.Size(130, 20);
             this.label2.TabIndex = 5;
             this.label2.Text = "Log File Location";
             // 
             // tb_LogFileLocation
             // 
-            this.tb_LogFileLocation.Location = new System.Drawing.Point(23, 390);
+            this.tb_LogFileLocation.Location = new System.Drawing.Point(26, 488);
             this.tb_LogFileLocation.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tb_LogFileLocation.Name = "tb_LogFileLocation";
-            this.tb_LogFileLocation.Size = new System.Drawing.Size(366, 22);
+            this.tb_LogFileLocation.Size = new System.Drawing.Size(411, 26);
             this.tb_LogFileLocation.TabIndex = 6;
             this.tb_LogFileLocation.Text = "H:\\VersionControlSpace\\io-list-import-tia-add-in\\Compile Logs";
-            this.tb_LogFileLocation.Click += new System.EventHandler(this.tb_LogFileLocation_Click);
             // 
             // btn_CreateHW
             // 
-            this.btn_CreateHW.Location = new System.Drawing.Point(68, 434);
+            this.btn_CreateHW.Location = new System.Drawing.Point(76, 542);
             this.btn_CreateHW.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.btn_CreateHW.Name = "btn_CreateHW";
-            this.btn_CreateHW.Size = new System.Drawing.Size(246, 91);
+            this.btn_CreateHW.Size = new System.Drawing.Size(277, 114);
             this.btn_CreateHW.TabIndex = 11;
             this.btn_CreateHW.Text = "Create Hardware";
             this.btn_CreateHW.UseVisualStyleBackColor = true;
@@ -124,20 +124,42 @@ namespace TIA_Addin_IO_List_Import
             // 
             // btn_CreateSample
             // 
-            this.btn_CreateSample.Location = new System.Drawing.Point(68, 229);
+            this.btn_CreateSample.Location = new System.Drawing.Point(76, 286);
             this.btn_CreateSample.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.btn_CreateSample.Name = "btn_CreateSample";
-            this.btn_CreateSample.Size = new System.Drawing.Size(246, 70);
+            this.btn_CreateSample.Size = new System.Drawing.Size(277, 88);
             this.btn_CreateSample.TabIndex = 12;
             this.btn_CreateSample.Text = "Create Sample CSV";
             this.btn_CreateSample.UseVisualStyleBackColor = true;
             this.btn_CreateSample.Click += new System.EventHandler(this.btn_CreateSample_Click);
             // 
+            // btnIOListLocDialog
+            // 
+            this.btnIOListLocDialog.Location = new System.Drawing.Point(400, 201);
+            this.btnIOListLocDialog.Name = "btnIOListLocDialog";
+            this.btnIOListLocDialog.Size = new System.Drawing.Size(45, 32);
+            this.btnIOListLocDialog.TabIndex = 13;
+            this.btnIOListLocDialog.Text = "...";
+            this.btnIOListLocDialog.UseVisualStyleBackColor = true;
+            this.btnIOListLocDialog.Click += new System.EventHandler(this.btnIOListLocDialog_Click);
+            // 
+            // btnLogLocationDialog
+            // 
+            this.btnLogLocationDialog.Location = new System.Drawing.Point(436, 485);
+            this.btnLogLocationDialog.Name = "btnLogLocationDialog";
+            this.btnLogLocationDialog.Size = new System.Drawing.Size(45, 32);
+            this.btnLogLocationDialog.TabIndex = 14;
+            this.btnLogLocationDialog.Text = "...";
+            this.btnLogLocationDialog.UseVisualStyleBackColor = true;
+            this.btnLogLocationDialog.Click += new System.EventHandler(this.btnLogLocationDialog_Click);
+            // 
             // IOListInterface
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1268, 602);
+            this.ClientSize = new System.Drawing.Size(1426, 752);
+            this.Controls.Add(this.btnLogLocationDialog);
+            this.Controls.Add(this.btnIOListLocDialog);
             this.Controls.Add(this.btn_CreateSample);
             this.Controls.Add(this.btn_CreateHW);
             this.Controls.Add(this.tb_LogFileLocation);
@@ -168,5 +190,7 @@ namespace TIA_Addin_IO_List_Import
         private System.Windows.Forms.TextBox tb_LogFileLocation;
         private System.Windows.Forms.Button btn_CreateHW;
         private System.Windows.Forms.Button btn_CreateSample;
+        private System.Windows.Forms.Button btnIOListLocDialog;
+        private System.Windows.Forms.Button btnLogLocationDialog;
     }
 }

@@ -134,31 +134,41 @@ namespace TIA_Addin_IO_List_Import
         }
 
 
-        //Create folder dialog outside of function to pass back and forth
-        FolderBrowserDialog folderDialog = new FolderBrowserDialog();
-
-
-        private void btn_FolderDialog_Click(object sender, EventArgs e)
+        //Create folder dialog for log location
+        FolderBrowserDialog folderDialog = new FolderBrowserDialog()
         {
-            //FolderBrowserDialog folderDialog = new FolderBrowserDialog();
-            folderDialog.ShowNewFolderButton = true;
-            folderDialog.RootFolder = Environment.SpecialFolder.Desktop;            
-            DialogResult result = folderDialog.ShowDialog();
+            //Set folder dialog attributes
+            ShowNewFolderButton = true
+        };
+
+        //Create file dialog for IO list location
+        OpenFileDialog fileDialog = new OpenFileDialog()
+        {
+            //Set filedialog attributes
+            DefaultExt = "csv",
+            CheckPathExists = true,
+            CheckFileExists = true,
+            Title = "Browse for csv file",
+            Filter = "csv files (*.csv)|*.csv",
+            FilterIndex = 2
+        };
+             
+
+        private void btnIOListLocDialog_Click(object sender, EventArgs e)
+        {               
+            DialogResult result = fileDialog.ShowDialog();
             if (result == DialogResult.OK)
             {
-                tb_CSVFileLocation.Text = folderDialog.SelectedPath;
-                                
+                tb_CSVFileLocation.Text = fileDialog.FileName;
             }
         }
 
-        private void tb_LogFileLocation_Click(object sender, EventArgs e)
-        {
-            //FolderBrowserDialog folderDialog = new FolderBrowserDialog();
-            folderDialog.ShowNewFolderButton = true;
+        private void btnLogLocationDialog_Click(object sender, EventArgs e)
+        {            
             DialogResult result = folderDialog.ShowDialog();
             if (result == DialogResult.OK)
             {
-                tb_CSVFileLocation.Text = folderDialog.SelectedPath;
+                tb_LogFileLocation.Text = folderDialog.SelectedPath;
 
             }
         }
